@@ -5,13 +5,17 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
-if SHIELD_MINIMAL_KEYS_R 
- choice
-     prompt "PMW3610 extras"
+# ───────── PMW3610 driver extra options ─────────
+if SHIELD_MINIMAL_KEYS_R     # ← 右手シールドでだけ有効
 
- endchoice
+menu "PMW3610 extras"
 
-endif  # SHIELD_MINIMAL_KEYS_R
+config PMW3610_CS_HIZ_AFTER_XFER
+    bool "CS pin: Hi-Z after SPI"
+    default y
+
+endmenu
+endif
 
 menuconfig PMW3610
     bool "PMW3610 mouse optical sensor"
