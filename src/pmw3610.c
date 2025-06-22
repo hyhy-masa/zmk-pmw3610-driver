@@ -824,6 +824,10 @@ static void pmw3610_motion_isr(const struct device *port,
     gpio_pin_configure_dt(&pmw->cs, GPIO_INPUT);
 }
 
+#ifdef CONFIG_PMW3610_CS_HIZ_AFTER_XFER
+gpio_pin_configure_dt(&pmw->cs, GPIO_INPUT);
+#endif
+
 
 #define PMW3610_DEFINE(n)                                                                          \
     static struct pixart_data data##n;                                                             \
