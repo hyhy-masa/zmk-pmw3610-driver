@@ -5,197 +5,168 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
-# ───────── PMW3610 driver extra options ─────────
-if SHIELD_MINIMAL_KEYS_R     # ← 右手シールドでだけ有効
-
-menu "PMW3610 extras"
-
-config PMW3610_CS_HIZ_AFTER_XFER
-    bool "CS pin: Hi-Z after SPI"
-    default y
-
-endmenu
-endif
-
 menuconfig PMW3610
     bool "PMW3610 mouse optical sensor"
-  select SPI
+    select SPI
     help
-      Enable PMW3610 mouse optical sensor.
+      Enable support for the PMW3610 optical trackball sensor.
 
 if PMW3610
 
 config PMW3610_SMART_ALGORITHM
-  bool "Enable an algorithm of PMW3610 to enhance surface coverage"
-  default y
-  help
-    Enable the integration of the smart algorithm as the datasheet implementation.
-    The algorithm is used to extend the tracking acrocss a wider range of surfaces
-    such as graniles and tiles.
+    bool "Enable smart surface coverage algorithm"
+    default y
+    help
+      Enable the PMW3610’s built-in smart algorithm for improved tracking on various surfaces.
 
 config PMW3610_CPI
-    int "PMW3610's default CPI"
+    int "PMW3610 default CPI"
     default 800
     range 200 3200
     help
-      Default CPI value, with 200 step
+      Sets the sensor resolution in Counts Per Inch (CPI). Must be a multiple of 200 between 200 and 3200.
 
 config PMW3610_CPI_DIVIDOR
-    int "PMW3610's default CPI dividor"
+    int "PMW3610 CPI divisor"
     default 1
     range 1 100
     help
-      Default CPI dividor value.
+      Divides the sensor’s reported movement by this value. Use 1 for normal speed, or higher values to slow down cursor movement.
 
 config PMW3610_SNIPE_CPI
-    int "PMW3610's CPI in snipe mode"
+    int "PMW3610 CPI in snipe mode"
     default 200
     range 200 3200
     help
-      Snipe CPI value, with 200 step
+      Alternate CPI to use when “snipe mode” is activated (e.g., for fine control). Must be a multiple of 200.
 
 config PMW3610_SNIPE_CPI_DIVIDOR
-    int "PMW3610's CPI dividor in snipe mode"
+    int "PMW3610 CPI divisor in snipe mode"
     default 1
     range 1 100
     help
-      Snipe CPI dividor value.
+      Divides movement in snipe mode by this value (similar to CPI_DIVIDOR, but applied only in snipe mode).
 
 config PMW3610_SCROLL_TICK
-    int "PMW3610's required ticks to produce a scroll report"
+    int "PMW3610 scroll tick threshold"
     default 20
     help
-      Scroll tick value.
+      The amount of sensor movement (in arbitrary units) required to generate one scroll step. Smaller values make scrolling more sensitive.
 
 choice
-    prompt "Select PMW3610's polling rate"
+    prompt "PMW3610 polling rate"
     default PMW3610_POLLING_RATE_250
 
 config PMW3610_POLLING_RATE_250
     bool "250 Hz"
 
 config PMW3610_POLLING_RATE_125
-
-config PMW3610_CS_HIZ_AFTER_XFER
-    bool "PMW3610: set CS Hi-Z after SPI"
-    default y
-
     bool "125 Hz"
 
 config PMW3610_POLLING_RATE_125_SW
-    bool "125 Hz with software implementation"
+    bool "125 Hz (software implementation)"
 
 endchoice
 
 config PMW3610_FORCE_AWAKE
-    bool "PMW3610 forced awake mode"
+    bool "Force PMW3610 awake (disable sleep modes)"
     help
-      This setting forces the sensor to always be in the RUN state.
+      If enabled, the sensor will remain in RUN mode (active) and never enter lower power rest modes.
 
 config PMW3610_RUN_DOWNSHIFT_TIME_MS
-    int "PMW3610's default RUN mode downshift time"
+    int "RUN mode downshift time (ms)"
     default 128
     range 13 3264
     help
-      Default RUN mode downshift down time in milliseconds.
-      Time after which sensor goes from RUN to REST1 mode.
+      Time in milliseconds before the sensor enters REST1 mode from RUN mode (when no motion is detected). A larger value keeps the sensor in RUN mode longer.
 
 config PMW3610_REST1_SAMPLE_TIME_MS
-    int "PMW3610's sample time in REST1 stage"
+    int "REST1 mode sample period (ms)"
     default 40
     range 10 2550
     help
-      Default REST1 mode sample period in millisecond
+      Interval in milliseconds between sensor checks in REST1 (first low-power) mode.
 
 config PMW3610_REST1_DOWNSHIFT_TIME_MS
-    int "PMW3610's default REST1 mode downshift time"
+    int "REST1 mode downshift time (ms)"
     default 9600
     help
-      Default REST1 mode downshift down time in milliseconds.
-      Time after which sensor goes from REST1 to REST2 mode.
+      Time in milliseconds before the sensor enters REST2 mode from REST1 mode (when still no motion is detected).
 
 config PMW3610_REST2_SAMPLE_TIME_MS
-    int "PMW3610's sample time in REST2 stage"
+    int "REST2 mode sample period (ms)"
     default 0
     range 0 2550
     help
-      Default REST2 mode sample period in millisecond.
-      Minimum value is 10.
-      No optimal value provided by datasheet.
+      Interval in milliseconds between sensor checks in REST2 mode. 0 uses the sensor’s default (100 ms).
 
 config PMW3610_REST2_DOWNSHIFT_TIME_MS
-    int "PMW3610's default REST2 mode downshift time"
+    int "REST2 mode downshift time (ms)"
     default 0
     help
-      Default REST2 mode downshift down time in milliseconds.
-      Time after which sensor goes from REST2 to REST3 mode.
-      No optimal value provided by datasheet.
+      Time in milliseconds before the sensor enters REST3 mode from REST2 mode. 0 uses the sensor’s default timing.
 
 config PMW3610_REST3_SAMPLE_TIME_MS
-    int "PMW3610's sample time in REST3 stage"
+    int "REST3 mode sample period (ms)"
     default 0
     range 0 2550
     help
-      Default REST2 mode sample period in millisecond.
-      Minimum value is 10.
-      No optimal value provided by datasheet.
+      Interval in milliseconds between sensor checks in REST3 mode (deepest rest). 0 uses the sensor’s default timing.
 
 choice
-    prompt "Select PMW3610 sensor orientation"
+    prompt "PMW3610 sensor orientation"
     default PMW3610_ORIENTATION_0
 
 config PMW3610_ORIENTATION_0
-    bool "PMW3610 not rotated"
+    bool "No rotation (0°)"
 
 config PMW3610_ORIENTATION_90
-    bool "PMW3610 rotated 90 deg clockwise"
+    bool "Rotated 90° clockwise"
 
 config PMW3610_ORIENTATION_180
-    bool "PMW3610 rotated 180 deg clockwise"
+    bool "Rotated 180° clockwise"
 
 config PMW3610_ORIENTATION_270
-    bool "PMW3610 rotated 270 deg clockwise"
+    bool "Rotated 270° clockwise"
 
 endchoice
 
 config PMW3610_INVERT_X
-  bool "Invert the X axis of PMW3610 sensor"
+    bool "Invert X axis movement"
 
 config PMW3610_INVERT_Y
-  bool "Invert the Y axis of PMW3610 sensor"
+    bool "Invert Y axis movement"
 
 config PMW3610_INVERT_SCROLL_X
-  bool "Invert the X axis of the scroll"
-  default PMW3610_INVERT_X
+    bool "Invert scroll X axis"
+    default PMW3610_INVERT_X
 
 config PMW3610_INVERT_SCROLL_Y
-  bool "Invert the Y axis of the scroll"
-  default PMW3610_INVERT_Y
+    bool "Invert scroll Y axis"
+    default PMW3610_INVERT_Y
 
 config PMW3610_AUTOMOUSE_TIMEOUT_MS
-  int "Amount of milliseconds the mouse layer will be active after using the trackball"
-  default 400
+    int "Auto-mouse layer timeout (ms)"
+    default 400
+    help
+      Duration (in milliseconds) that the mouse layer remains active after the last trackball movement, when using automatic mouse layer switching.
+
+config PMW3610_MOVEMENT_THRESHOLD
+    int "Auto-mouse activation threshold"
+    default 5
+    help
+      Amount of movement (in sensor counts) required to trigger automatic mouse layer activation. Higher values require more movement to switch into mouse mode (avoids accidental mode switches).
+
+config PMW3610_CS_HIZ_AFTER_XFER
+    bool "Tri-state CS pin after SPI transfers"
+    default y
+    help
+      **Enable this if the PMW3610’s chip-select line is shared with other functions (such as a matrix column).** When enabled, the driver will release the CS GPIO to a high-impedance state (input) whenever it is not actively communicating with the sensor. This prevents the PMW3610 from driving the line except during SPI transfers, avoiding conflicts on that pin.
+
+# Removed PMW3610_ADJUSTABLE_MOUSESPEED and PMW3610_CS_GPIO_MANUAL (unused/duplicate options)
 
 module = PMW3610
 module-str = PMW3610
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
 
-endif #PMW3610
-
-menuconfig PMW3610_EXTRAS
-    bool "PMW3610 extra config" if SHIELD_MINIMAL_KEYS_R
-    default y                   if SHIELD_MINIMAL_KEYS_R
-    help
-      Only compile these options when the right-hand shield is selected.
-
-if PMW3610_EXTRAS
-
-choice
-    prompt "CS Hi-Z toggle"
-config PMW3610_CS_HIZ_AFTER_XFER
-    bool "Toggle CS pin to Hi-Z"
-config PMW3610_POLLING_RATE_125
-    bool
-endchoice
-
-endif # PMW3610_EXTRAS
+endif # PMW3610
