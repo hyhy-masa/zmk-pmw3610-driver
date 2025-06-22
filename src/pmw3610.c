@@ -814,14 +814,10 @@ static int pmw3610_init(const struct device *dev) {
 static void pmw3610_motion_isr(const struct device *port,
                                struct gpio_callback *cb, uint32_t pins)
 {
-    /* 1) CS ピンを **Low 出力** に変換 = センサ選択 */
-    gpio_pin_configure_dt(&pmw->cs, GPIO_OUTPUT_LOW);
+  gpio_pin_configure_dt(&pmw->cs, GPIO_OUTPUT_LOW);
+ pmw3610_read_motion(pmw);
+ gpio_pin_configure_dt(&pmw->cs, GPIO_INPUT);
 
-    /* 2) SPI でデータ取得  */
-    pmw3610_read_motion(pmw);
-
-    /* 3) すぐ **入力(Hi-Z)** に戻す = キーボード行列へ返却 */
-    gpio_pin_configure_dt(&pmw->cs, GPIO_INPUT);
 }
 
 #ifdef CONFIG_PMW3610_CS_HIZ_AFTER_XFER
