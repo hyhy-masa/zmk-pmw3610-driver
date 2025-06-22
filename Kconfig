@@ -169,3 +169,21 @@ module-str = PMW3610
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
 
 endif #PMW3610
+
+menuconfig PMW3610_EXTRAS
+    bool "PMW3610 extra config" if SHIELD_MINIMAL_KEYS_R
+    default y                   if SHIELD_MINIMAL_KEYS_R
+    help
+      Only compile these options when the right-hand shield is selected.
+
+if PMW3610_EXTRAS
+
+choice
+    prompt "CS Hi-Z toggle"
+config PMW3610_CS_HIZ_AFTER_XFER
+    bool "Toggle CS pin to Hi-Z"
+config PMW3610_POLLING_RATE_125
+    bool
+endchoice
+
+endif # PMW3610_EXTRAS
