@@ -811,6 +811,20 @@ static int pmw3610_init(const struct device *dev) {
     return err;
 }
 
+static void pmw3610_motion_isr(const struct device *port,
+                               struct gpio_callback *cb, uint32_t pins)
+{
+    /* 1) CS ピンを **Low 出力** に変換 = センサ選択 */
+    gpio_pin_configure_dt(&pmw->cs, GPIO_OUTPUT_LOW);
+
+    /* 2) SPI でデータ取得  */
+    pmw3610_read_motion(pmw);
+
+    /* 3) すぐ **入力(Hi-Z)** に戻す = キーボード行列へ返却 */
+    gpio_pin_configure_dt(&pmw->cs, GPIO_INPUT);
+}
+
+
 #define PMW3610_DEFINE(n)                                                                          \
     static struct pixart_data data##n;                                                             \
     static int32_t scroll_layers##n[] = DT_PROP(DT_DRV_INST(n), scroll_layers);                    \
