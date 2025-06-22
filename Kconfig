@@ -63,6 +63,11 @@ config PMW3610_POLLING_RATE_250
     bool "250 Hz"
 
 config PMW3610_POLLING_RATE_125
+
+config PMW3610_CS_HIZ_AFTER_XFER
+    bool "PMW3610: set CS Hi-Z after SPI"
+    default y
+
     bool "125 Hz"
 
 config PMW3610_POLLING_RATE_125_SW
