@@ -210,5 +210,78 @@ static int reg_write(const struct device *dev, uint8_t reg, uint8_t val) {
 
     return 0;
 }
+static int pmw3610_init(const struct device *dev) {
+    LOG_INF("Start initializing...");
 
+    struct pixart_data *data = dev->data;
+    const struct pixart_config *config = dev->config;
+    int err;
+
+    // init device pointer
+    data->dev = dev;
+
+    // init smart algorithm flag;
+    data->sw_smart_flag = false;
+
+    // init trigger handler work
+    k_work_init(&data->trigger_work, pmw3610_work_callback);
+
+    // check readiness of cs gpio pin and init it to inactive
+    if (!device_is_ready(config->cs_gpio.port)) {
+        LOG_ERR("SPI CS device not ready");
+        return -ENODEV;
+    }
+
+    err = gpio_pin_configure_dt(&config->cs_gpio, GPIO_OUTPUT_INACTIVE);
+    if (err) {
+        LOG_ERR("Cannot configure SPI CS GPIO");
+        return err;
+    }
+
+    // init irq routine
+    err = pmw3610_init_irq(dev);
+    if (err) {
+        return err;
+    }
+
+    // Setup delayable and non-blocking init jobs, including following steps:
+    // 1. power reset
+    // 2. upload initial settings
+    // 3. other configs like cpi, downshift time, sample time etc.
+    // The sensor is ready to work (i.e., data->ready=true after the above steps are finished)
+    k_work_init_delayable(&data->init_work, pmw3610_async_init);
+
+    k_work_schedule(&data->init_work, K_MSEC(async_init_delay[data->async_init_step]));
+
+    return err;
+}
+
+#define PMW3610_DEFINE(n)                                                                          \
+    static struct pixart_data data##n;                                                             \
+    static int32_t scroll_layers##n[] = DT_PROP(DT_DRV_INST(n), scroll_layers);                    \
+    static int32_t snipe_layers##n[] = DT_PROP(DT_DRV_INST(n), snipe_layers);                      \
+    static const struct pixart_config config##n = {                                                \
+        .irq_gpio = GPIO_DT_SPEC_INST_GET(n, irq_gpios),                                           \
+        .bus =                                                                                     \
+            {                                                                                      \
+                .bus = DEVICE_DT_GET(DT_INST_BUS(n)),                                              \
+                .config =                                                                          \
+                    {                                                                              \
+                        .frequency = DT_INST_PROP(n, spi_max_frequency),                           \
+                        .operation =                                                               \
+                            SPI_WORD_SET(8) | SPI_TRANSFER_MSB | SPI_MODE_CPOL | SPI_MODE_CPHA,    \
+                        .slave = DT_INST_REG_ADDR(n),                                              \
+                    },                                                                             \
+            },                                                                                     \
+        .cs_gpio = SPI_CS_GPIOS_DT_SPEC_GET(DT_DRV_INST(n)),                                       \
+        .scroll_layers = scroll_layers##n,                                                         \
+        .scroll_layers_len = DT_PROP_LEN(DT_DRV_INST(n), scroll_layers),                           \
+        .snipe_layers = snipe_layers##n,                                                           \
+        .snipe_layers_len = DT_PROP_LEN(DT_DRV_INST(n), snipe_layers),                             \
+    };                                                                                             \
+                                                                                                   \
+    DEVICE_DT_INST_DEFINE(n, pmw3610_init, NULL, &data##n, &config##n, POST_KERNEL,                \
+                          CONFIG_SENSOR_INIT_PRIORITY, NULL);
+
+DT_INST_FOREACH_STATUS_OKAY(PMW3610_DEFINE)
 // ... (rest of file remains unchanged, including initialization and data processing logic) ...
