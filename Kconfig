@@ -5,6 +5,14 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
+if SHIELD_MINIMAL_KEYS_R 
+ choice
+     prompt "PMW3610 extras"
+@@
+ endchoice
+
+endif  # SHIELD_MINIMAL_KEYS_R
+
 menuconfig PMW3610
     bool "PMW3610 mouse optical sensor"
   select SPI
