@@ -101,15 +101,16 @@ static int spi_cs_ctrl(const struct device *dev, bool enable) {
 
     return err;
 }
-/* ----------  IRQ → workqueue ---------- */
-static void pmw3610_gpio_callback(const struct device *port,
-                                  struct gpio_callback *cb,
-                                  uint32_t pins)
-{
-    struct pmw3610_data *data =
-        CONTAINER_OF(cb, struct pmw3610_data, gpio_cb);
 
-    /*  割り込み発生時にワークをキューへ          */
+static void pmw3610_gpio_callback(const struct device *gpiob, struct gpio_callback *cb,
+                                  uint32_t pins) {
+    struct pixart_data *data = CONTAINER_OF(cb, struct pixart_data, irq_gpio_cb);
+    const struct device *dev = data->dev;
+    sensor_trigger_handler_t handler;
+
+    set_interrupt(dev, false);
+
+    // submit the real handler work
     k_work_submit(&data->trigger_work);
 }
 
@@ -128,6 +129,7 @@ static void pmw3610_work_callback(struct k_work *work)
         data->handler(data->dev, &trig);
     }
 }
+
 
 
 static int reg_read(const struct device *dev, uint8_t reg, uint8_t *buf) {
