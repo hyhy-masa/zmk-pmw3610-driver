@@ -164,7 +164,7 @@ config PMW3610_MOVEMENT_THRESHOLD
     help
       Amount of movement (in sensor counts) required to trigger automatic mouse layer activation. Higher values require more movement to switch into mouse mode (avoids accidental mode switches).
 
-hoice PMW3610_CS_MODE
+choice PMW3610_CS_MODE
     prompt "PMW3610 CSピン動作モード"
     default PMW3610_CS_HIZ_AFTER_XFER
     help
