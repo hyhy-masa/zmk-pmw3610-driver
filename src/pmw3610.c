@@ -101,6 +101,34 @@ static int spi_cs_ctrl(const struct device *dev, bool enable) {
 
     return err;
 }
+/* ----------  IRQ → workqueue ---------- */
+static void pmw3610_gpio_callback(const struct device *port,
+                                  struct gpio_callback *cb,
+                                  uint32_t pins)
+{
+    struct pmw3610_data *data =
+        CONTAINER_OF(cb, struct pmw3610_data, gpio_cb);
+
+    /*  割り込み発生時にワークをキューへ          */
+    k_work_submit(&data->trigger_work);
+}
+
+/* ----------  workqueue → アプリ層 ---------- */
+static void pmw3610_work_callback(struct k_work *work)
+{
+    struct pmw3610_data *data =
+        CONTAINER_OF(work, struct pmw3610_data, trigger_work);
+
+    if (data->handler) {
+        /*  データ読取完了をアプリ側へ通知          */
+        struct sensor_trigger trig = {
+            .type = SENSOR_TRIG_DATA_READY,
+            .chan = SENSOR_CHAN_ALL,
+        };
+        data->handler(data->dev, &trig);
+    }
+}
+
 
 static int reg_read(const struct device *dev, uint8_t reg, uint8_t *buf) {
     int err;
