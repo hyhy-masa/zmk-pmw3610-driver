@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
+# PMW3610 mouse optical sensor driver configuration
+
 menuconfig PMW3610
     bool "PMW3610 mouse optical sensor"
     select SPI
@@ -17,7 +19,7 @@ config PMW3610_SMART_ALGORITHM
     bool "Enable smart surface coverage algorithm"
     default y
     help
-      Enable the PMW3610’s built-in smart algorithm for improved tracking on various surfaces.
+      Enable the PMW3610's built-in smart algorithm for improved tracking on various surfaces.
 
 config PMW3610_CPI
     int "PMW3610 default CPI"
@@ -31,14 +33,14 @@ config PMW3610_CPI_DIVIDOR
     default 1
     range 1 100
     help
-      Divides the sensor’s reported movement by this value. Use 1 for normal speed, or higher values to slow down cursor movement.
+      Divides the sensor's reported movement by this value. Use 1 for normal speed, or higher values to slow down cursor movement.
 
 config PMW3610_SNIPE_CPI
     int "PMW3610 CPI in snipe mode"
     default 200
     range 200 3200
     help
-      Alternate CPI to use when “snipe mode” is activated (e.g., for fine control). Must be a multiple of 200.
+      Alternate CPI to use when "snipe mode" is activated (e.g., for fine control). Must be a multiple of 200.
 
 config PMW3610_SNIPE_CPI_DIVIDOR
     int "PMW3610 CPI divisor in snipe mode"
@@ -68,6 +70,17 @@ config PMW3610_POLLING_RATE_125_SW
 
 endchoice
 
+config PMW3610_CS_GPIO_MANUAL
+    bool "Leave CS as output (manual control of CS pin)"
+    help
+      センサドライバがCSピンを自動制御しません。通信後もCSピンは出力状態のまま保持されます。
+      他の制御が必要な特殊な場合に用います。（通常は無効のままで問題ありません）
+
+config PMW3610_FORCE_AWAKE
+    bool "Force PMW3610 awake (disable sleep modes)"
+    help
+      If enabled, the sensor will remain in RUN mode (active) and never enter lower power rest modes.
+
 config PMW3610_RUN_DOWNSHIFT_TIME_MS
     int "RUN mode downshift time (ms)"
     default 128
@@ -93,21 +106,20 @@ config PMW3610_REST2_SAMPLE_TIME_MS
     default 0
     range 0 2550
     help
-      Interval in milliseconds between sensor checks in REST2 mode. 0 uses the sensor’s default (100 ms).
+      Interval in milliseconds between sensor checks in REST2 mode. 0 uses the sensor's default (100 ms).
 
 config PMW3610_REST2_DOWNSHIFT_TIME_MS
     int "REST2 mode downshift time (ms)"
     default 0
     help
-      Time in milliseconds before the sensor enters REST3 mode from REST2 mode. 0 uses the sensor’s default timing.
+      Time in milliseconds before the sensor enters REST3 mode from REST2 mode. 0 uses the sensor's default timing.
 
 config PMW3610_REST3_SAMPLE_TIME_MS
     int "REST3 mode sample period (ms)"
     default 0
     range 0 2550
     help
-      Interval in milliseconds between sensor checks in REST3 mode (deepest rest). 0 uses the sensor’s default timing.
-endchoice
+      Interval in milliseconds between sensor checks in REST3 mode (deepest rest). 0 uses the sensor's default timing.
 
 choice
     prompt "PMW3610 sensor orientation"
@@ -153,21 +165,14 @@ config PMW3610_MOVEMENT_THRESHOLD
     help
       Amount of movement (in sensor counts) required to trigger automatic mouse layer activation. Higher values require more movement to switch into mouse mode (avoids accidental mode switches).
 
-choice PMW3610_CS_MODE
-    prompt "PMW3610 CSピン動作モード"
-    default PMW3610_CS_HIZ_AFTER_XFER
-    help
-        PMW3610センサのチップセレクト(CS)ピンの動作を選択します。
-        通信後にCSピンを開放（高インピーダンス）にするか、常に出力状態のままとするかを指定してください。
-endchoice
-
 config PMW3610_CS_HIZ_AFTER_XFER
     bool "Float CS line (high-impedance) after transfers"
     default y
     help
-      **Enable this if the PMW3610’s chip-select line is shared with other functions (such as a matrix column).** When enabled, the driver will release the CS GPIO to a high-impedance state (input) whenever it is not actively communicating with the sensor. This prevents the PMW3610 from driving the line except during SPI transfers, avoiding conflicts on that pin.
-
-# Removed PMW3610_ADJUSTABLE_MOUSESPEED and PMW3610_CS_GPIO_MANUAL (unused/duplicate options)
+      Enable this if the PMW3610's chip-select line is shared with other functions (such as a matrix column). 
+      When enabled, the driver will release the CS GPIO to a high-impedance state (input) whenever it is not 
+      actively communicating with the sensor. This prevents the PMW3610 from driving the line except during 
+      SPI transfers, avoiding conflicts on that pin.
 
 module = PMW3610
 module-str = PMW3610
