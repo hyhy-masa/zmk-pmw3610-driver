@@ -164,7 +164,7 @@ config PMW3610_MOVEMENT_THRESHOLD
     help
       Amount of movement (in sensor counts) required to trigger automatic mouse layer activation. Higher values require more movement to switch into mouse mode (avoids accidental mode switches).
 
-choice PMW3610_CS_MODE
+　 PMW3610_CS_MODE
     prompt "PMW3610 CSピン動作モード"
     default PMW3610_CS_HIZ_AFTER_XFER
     help
@@ -176,7 +176,7 @@ config PMW3610_CS_HIZ_AFTER_XFER
     default y
     help
       **Enable this if the PMW3610’s chip-select line is shared with other functions (such as a matrix column).** When enabled, the driver will release the CS GPIO to a high-impedance state (input) whenever it is not actively communicating with the sensor. This prevents the PMW3610 from driving the line except during SPI transfers, avoiding conflicts on that pin.
-
+endchoice
 # Removed PMW3610_ADJUSTABLE_MOUSESPEED and PMW3610_CS_GPIO_MANUAL (unused/duplicate options)
 
 module = PMW3610
