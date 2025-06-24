@@ -68,18 +68,6 @@ config PMW3610_POLLING_RATE_125_SW
 
 endchoice
 
-choice
-config PMW3610_CS_GPIO_MANUAL
-    bool "Leave CS as output (manual control of CS pin)"
-    help
-    センサドライバがCSピンを自動制御しません。通信後もCSピンは出力状態のまま保持されます。
-    他の制御が必要な特殊な場合に用います。（通常は無効のままで問題ありません）
-
-config PMW3610_FORCE_AWAKE
-    bool "Force PMW3610 awake (disable sleep modes)"
-    help
-      If enabled, the sensor will remain in RUN mode (active) and never enter lower power rest modes.
-
 config PMW3610_RUN_DOWNSHIFT_TIME_MS
     int "RUN mode downshift time (ms)"
     default 128
@@ -93,6 +81,18 @@ config PMW3610_REST1_SAMPLE_TIME_MS
     range 10 2550
     help
       Interval in milliseconds between sensor checks in REST1 (first low-power) mode.
+
+choice
+config PMW3610_CS_GPIO_MANUAL
+    bool "Leave CS as output (manual control of CS pin)"
+    help
+    センサドライバがCSピンを自動制御しません。通信後もCSピンは出力状態のまま保持されます。
+    他の制御が必要な特殊な場合に用います。（通常は無効のままで問題ありません）
+
+config PMW3610_FORCE_AWAKE
+    bool "Force PMW3610 awake (disable sleep modes)"
+    help
+      If enabled, the sensor will remain in RUN mode (active) and never enter lower power rest modes.
 
 config PMW3610_REST1_DOWNSHIFT_TIME_MS
     int "REST1 mode downshift time (ms)"
@@ -168,15 +168,16 @@ choice PMW3610_CS_MODE
     prompt "PMW3610 CSピン動作モード"
     default PMW3610_CS_HIZ_AFTER_XFER
     help
-    PMW3610センサのチップセレクト(CS)ピンの動作を選択します。
-    通信後にCSピンを開放（高インピーダンス）にするか、常に出力状態のままとするかを指定してください。
+        PMW3610センサのチップセレクト(CS)ピンの動作を選択します。
+        通信後にCSピンを開放（高インピーダンス）にするか、常に出力状態のままとするかを指定してください。
+endchoice
 
 config PMW3610_CS_HIZ_AFTER_XFER
     bool "Float CS line (high-impedance) after transfers"
     default y
     help
       **Enable this if the PMW3610’s chip-select line is shared with other functions (such as a matrix column).** When enabled, the driver will release the CS GPIO to a high-impedance state (input) whenever it is not actively communicating with the sensor. This prevents the PMW3610 from driving the line except during SPI transfers, avoiding conflicts on that pin.
-endchoice
+
 # Removed PMW3610_ADJUSTABLE_MOUSESPEED and PMW3610_CS_GPIO_MANUAL (unused/duplicate options)
 
 module = PMW3610
