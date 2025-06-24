@@ -82,18 +82,6 @@ config PMW3610_REST1_SAMPLE_TIME_MS
     help
       Interval in milliseconds between sensor checks in REST1 (first low-power) mode.
 
-choice
-config PMW3610_CS_GPIO_MANUAL
-    bool "Leave CS as output (manual control of CS pin)"
-    help
-    センサドライバがCSピンを自動制御しません。通信後もCSピンは出力状態のまま保持されます。
-    他の制御が必要な特殊な場合に用います。（通常は無効のままで問題ありません）
-
-config PMW3610_FORCE_AWAKE
-    bool "Force PMW3610 awake (disable sleep modes)"
-    help
-      If enabled, the sensor will remain in RUN mode (active) and never enter lower power rest modes.
-
 config PMW3610_REST1_DOWNSHIFT_TIME_MS
     int "REST1 mode downshift time (ms)"
     default 9600
@@ -120,6 +108,7 @@ config PMW3610_REST3_SAMPLE_TIME_MS
     help
       Interval in milliseconds between sensor checks in REST3 mode (deepest rest). 0 uses the sensor’s default timing.
 endchoice
+
 choice
     prompt "PMW3610 sensor orientation"
     default PMW3610_ORIENTATION_0
