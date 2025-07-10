@@ -5,58 +5,58 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
-# PMW3610 mouse optical sensor driver configuration
-
 menuconfig PMW3610
     bool "PMW3610 mouse optical sensor"
-    select SPI
+  select SPI
     help
-      Enable support for the PMW3610 optical trackball sensor.
+      Enable PMW3610 mouse optical sensor.
 
 if PMW3610
 
 config PMW3610_SMART_ALGORITHM
-    bool "Enable smart surface coverage algorithm"
-    default y
-    help
-      Enable the PMW3610's built-in smart algorithm for improved tracking on various surfaces.
+  bool "Enable an algorithm of PMW3610 to enhance surface coverage"
+  default y
+  help
+    Enable the integration of the smart algorithm as the datasheet implementation.
+    The algorithm is used to extend the tracking acrocss a wider range of surfaces
+    such as graniles and tiles.
 
 config PMW3610_CPI
-    int "PMW3610 default CPI"
+    int "PMW3610's default CPI"
     default 800
     range 200 3200
     help
-      Sets the sensor resolution in Counts Per Inch (CPI). Must be a multiple of 200 between 200 and 3200.
+      Default CPI value, with 200 step
 
 config PMW3610_CPI_DIVIDOR
-    int "PMW3610 CPI divisor"
+    int "PMW3610's default CPI dividor"
     default 1
     range 1 100
     help
-      Divides the sensor's reported movement by this value. Use 1 for normal speed, or higher values to slow down cursor movement.
+      Default CPI dividor value.
 
 config PMW3610_SNIPE_CPI
-    int "PMW3610 CPI in snipe mode"
+    int "PMW3610's CPI in snipe mode"
     default 200
     range 200 3200
     help
-      Alternate CPI to use when "snipe mode" is activated (e.g., for fine control). Must be a multiple of 200.
+      Snipe CPI value, with 200 step
 
 config PMW3610_SNIPE_CPI_DIVIDOR
-    int "PMW3610 CPI divisor in snipe mode"
+    int "PMW3610's CPI dividor in snipe mode"
     default 1
     range 1 100
     help
-      Divides movement in snipe mode by this value (similar to CPI_DIVIDOR, but applied only in snipe mode).
+      Snipe CPI dividor value.
 
 config PMW3610_SCROLL_TICK
-    int "PMW3610 scroll tick threshold"
+    int "PMW3610's required ticks to produce a scroll report"
     default 20
     help
-      The amount of sensor movement (in arbitrary units) required to generate one scroll step. Smaller values make scrolling more sensitive.
+      Scroll tick value.
 
 choice
-    prompt "PMW3610 polling rate"
+    prompt "Select PMW3610's polling rate"
     default PMW3610_POLLING_RATE_250
 
 config PMW3610_POLLING_RATE_250
@@ -66,116 +66,113 @@ config PMW3610_POLLING_RATE_125
     bool "125 Hz"
 
 config PMW3610_POLLING_RATE_125_SW
-    bool "125 Hz (software implementation)"
+    bool "125 Hz with software implementation"
 
 endchoice
 
-config PMW3610_CS_GPIO_MANUAL
-    bool "Leave CS as output (manual control of CS pin)"
-    help
-      センサドライバがCSピンを自動制御しません。通信後もCSピンは出力状態のまま保持されます。
-      他の制御が必要な特殊な場合に用います。（通常は無効のままで問題ありません）
-
 config PMW3610_FORCE_AWAKE
-    bool "Force PMW3610 awake (disable sleep modes)"
+    bool "PMW3610 forced awake mode"
     help
-      If enabled, the sensor will remain in RUN mode (active) and never enter lower power rest modes.
+      This setting forces the sensor to always be in the RUN state.
 
 config PMW3610_RUN_DOWNSHIFT_TIME_MS
-    int "RUN mode downshift time (ms)"
+    int "PMW3610's default RUN mode downshift time"
     default 128
     range 13 3264
     help
-      Time in milliseconds before the sensor enters REST1 mode from RUN mode (when no motion is detected). A larger value keeps the sensor in RUN mode longer.
+      Default RUN mode downshift down time in milliseconds.
+      Time after which sensor goes from RUN to REST1 mode.
 
 config PMW3610_REST1_SAMPLE_TIME_MS
-    int "REST1 mode sample period (ms)"
+    int "PMW3610's sample time in REST1 stage"
     default 40
     range 10 2550
     help
-      Interval in milliseconds between sensor checks in REST1 (first low-power) mode.
+      Default REST1 mode sample period in millisecond
 
 config PMW3610_REST1_DOWNSHIFT_TIME_MS
-    int "REST1 mode downshift time (ms)"
+    int "PMW3610's default REST1 mode downshift time"
     default 9600
     help
-      Time in milliseconds before the sensor enters REST2 mode from REST1 mode (when still no motion is detected).
+      Default REST1 mode downshift down time in milliseconds.
+      Time after which sensor goes from REST1 to REST2 mode.
 
 config PMW3610_REST2_SAMPLE_TIME_MS
-    int "REST2 mode sample period (ms)"
+    int "PMW3610's sample time in REST2 stage"
     default 0
     range 0 2550
     help
-      Interval in milliseconds between sensor checks in REST2 mode. 0 uses the sensor's default (100 ms).
+      Default REST2 mode sample period in millisecond.
+      Minimum value is 10.
+      No optimal value provided by datasheet.
 
 config PMW3610_REST2_DOWNSHIFT_TIME_MS
-    int "REST2 mode downshift time (ms)"
+    int "PMW3610's default REST2 mode downshift time"
     default 0
     help
-      Time in milliseconds before the sensor enters REST3 mode from REST2 mode. 0 uses the sensor's default timing.
+      Default REST2 mode downshift down time in milliseconds.
+      Time after which sensor goes from REST2 to REST3 mode.
+      No optimal value provided by datasheet.
 
 config PMW3610_REST3_SAMPLE_TIME_MS
-    int "REST3 mode sample period (ms)"
+    int "PMW3610's sample time in REST3 stage"
     default 0
     range 0 2550
     help
-      Interval in milliseconds between sensor checks in REST3 mode (deepest rest). 0 uses the sensor's default timing.
+      Default REST2 mode sample period in millisecond.
+      Minimum value is 10.
+      No optimal value provided by datasheet.
 
 choice
-    prompt "PMW3610 sensor orientation"
+    prompt "Select PMW3610 sensor orientation"
     default PMW3610_ORIENTATION_0
 
 config PMW3610_ORIENTATION_0
-    bool "No rotation (0°)"
+    bool "PMW3610 not rotated"
 
 config PMW3610_ORIENTATION_90
-    bool "Rotated 90° clockwise"
+    bool "PMW3610 rotated 90 deg clockwise"
 
 config PMW3610_ORIENTATION_180
-    bool "Rotated 180° clockwise"
+    bool "PMW3610 rotated 180 deg clockwise"
 
 config PMW3610_ORIENTATION_270
-    bool "Rotated 270° clockwise"
+    bool "PMW3610 rotated 270 deg clockwise"
 
 endchoice
 
 config PMW3610_INVERT_X
-    bool "Invert X axis movement"
+  bool "Invert the X axis of PMW3610 sensor"
 
 config PMW3610_INVERT_Y
-    bool "Invert Y axis movement"
+  bool "Invert the Y axis of PMW3610 sensor"
 
 config PMW3610_INVERT_SCROLL_X
-    bool "Invert scroll X axis"
-    default PMW3610_INVERT_X
+  bool "Invert the X axis of the scroll"
+  default PMW3610_INVERT_X
 
 config PMW3610_INVERT_SCROLL_Y
-    bool "Invert scroll Y axis"
-    default PMW3610_INVERT_Y
+  bool "Invert the Y axis of the scroll"
+  default PMW3610_INVERT_Y
 
 config PMW3610_AUTOMOUSE_TIMEOUT_MS
-    int "Auto-mouse layer timeout (ms)"
-    default 400
-    help
-      Duration (in milliseconds) that the mouse layer remains active after the last trackball movement, when using automatic mouse layer switching.
+  int "Amount of milliseconds the mouse layer will be active after using the trackball"
+  default 400
+
+config PMW3610_ADJUSTABLE_MOUSESPEED
+  bool "Enable Adujutable mouse speed"
+  default n
 
 config PMW3610_MOVEMENT_THRESHOLD
-    int "Auto-mouse activation threshold"
+    int "Movement threshold for automatic mouse layer activation"
     default 5
     help
-      Amount of movement (in sensor counts) required to trigger automatic mouse layer activation. Higher values require more movement to switch into mouse mode (avoids accidental mode switches).
-
-config PMW3610_CS_HIZ_AFTER_XFER
-    bool "Float CS line (high-impedance) after transfers"
-    default y
-    help
-      Enable this if the PMW3610's chip-select line is shared with other functions (such as a matrix column). 
-      When enabled, the driver will release the CS GPIO to a high-impedance state (input) whenever it is not 
-      actively communicating with the sensor. This prevents the PMW3610 from driving the line except during 
-      SPI transfers, avoiding conflicts on that pin.
+        The threshold for trackball movement that triggers the automatic mouse layer.
+        A higher value means more movement is required to activate the mouse layer.
+        This helps prevent accidental activation during typing.
 
 module = PMW3610
 module-str = PMW3610
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
 
-endif # PMW3610
+endif #PMW3610
