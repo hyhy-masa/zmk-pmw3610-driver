@@ -634,6 +634,17 @@ static int pmw3610_report_data(const struct device *dev) {
         TOINT16((buf[PMW3610_X_L_POS] + ((buf[PMW3610_XY_H_POS] & 0xF0) << 4)), 12) / dividor;
     int16_t raw_y =
         TOINT16((buf[PMW3610_Y_L_POS] + ((buf[PMW3610_XY_H_POS] & 0x0F) << 8)), 12) / dividor;
+
+      // ★ X/Y軸個別スケーリングを追加（ADJUSTABLE_MOUSESPEEDの前に）
+    #if defined(CONFIG_PMW3610_X_SCALE) && CONFIG_PMW3610_X_SCALE != 100
+        raw_x = (raw_x * CONFIG_PMW3610_X_SCALE) / 100;
+    #endif
+    
+    #if defined(CONFIG_PMW3610_Y_SCALE) && CONFIG_PMW3610_Y_SCALE != 100
+        raw_y = (raw_y * CONFIG_PMW3610_Y_SCALE) / 100;
+    #endif
+    
+    #ifdef CONFIG_PMW3610_ADJUSTABLE_MOUSESPEED
     
 #ifdef CONFIG_PMW3610_ADJUSTABLE_MOUSESPEED
     int16_t movement_size = abs(raw_x) + abs(raw_y);
