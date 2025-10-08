@@ -668,7 +668,6 @@ static int pmw3610_report_data(const struct device *dev) {
 
     raw_x = raw_x * speed_multiplier;
     raw_y = raw_y * speed_multiplier;
-
 #endif
 
     if (IS_ENABLED(CONFIG_PMW3610_ORIENTATION_0)) {
