@@ -644,8 +644,6 @@ static int pmw3610_report_data(const struct device *dev) {
         raw_y = (raw_y * CONFIG_PMW3610_Y_SCALE) / 100;
     #endif
     
-    #ifdef CONFIG_PMW3610_ADJUSTABLE_MOUSESPEED
-    
 #ifdef CONFIG_PMW3610_ADJUSTABLE_MOUSESPEED
     int16_t movement_size = abs(raw_x) + abs(raw_y);
 
