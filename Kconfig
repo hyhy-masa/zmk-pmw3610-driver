@@ -55,6 +55,23 @@ config PMW3610_SCROLL_TICK
     help
       Scroll tick value.
 
+# X/Y軸のスケーリング設定を追加（PMW3610_INVERT_Yの後あたり）
+config PMW3610_X_SCALE
+  int "X axis scaling factor (percentage)"
+  default 100
+  range 10 500
+  help
+    Scaling factor for X axis movement. 100 = 100% (no scaling),
+    50 = 50% (half speed), 200 = 200% (double speed)
+
+config PMW3610_Y_SCALE
+  int "Y axis scaling factor (percentage)"
+  default 100
+  range 10 500
+  help
+    Scaling factor for Y axis movement. 100 = 100% (no scaling),
+    50 = 50% (half speed), 200 = 200% (double speed)
+
 choice
     prompt "Select PMW3610's polling rate"
     default PMW3610_POLLING_RATE_250
